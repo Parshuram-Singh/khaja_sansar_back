@@ -1,28 +1,16 @@
 import mongoose from "mongoose";
 
-const SubscriptionSchema = new mongoose.Schema(
-  {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    selectedPlan: {
-      type: String,
-      enum: ["Weekly Plan", "Monthly Plan", "Corporate Plan"],
-      required: true,
-    },
-    dietaryPreference: {
-      type: String,
-      enum: [
-        "Nepali",
-        "Japanese",
-        "Vegetarian",
-        "Non-Vegetarian",
-        "Gluten-Free",
-      ],
-      required: true,
-    },
-    deliverySchedule: { type: [String], required: true }, // Array of selected days
-    deliveryTime: { type: String, required: true },
-  },
-  { timestamps: true }
-);
+const SubscriptionSchema = new mongoose.Schema({
+  productId: { type: String, required: true },
+  productName: { type: String, required: true },
+  price: { type: Number, required: true },
+  dietaryPreference: { type: String, required: true },
+  deliverySchedule: { type: [String], required: true },
+  deliveryTime: { type: String, required: true },
+  selectedPlan: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
 
-module.exports = mongoose.model("Subscription", SubscriptionSchema);
+const Subscription = mongoose.model("Subscription", SubscriptionSchema);
+
+export default Subscription; 

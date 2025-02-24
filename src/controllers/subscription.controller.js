@@ -1,21 +1,33 @@
-const subscriptionService = require('../services/subscription.service');
+// controllers/subscription.controller.js
+import Subscription from "../models/subscription.model.js";
 
-const createSubscription = async (req, res, next) => {
+// Save subscription
+export const saveSubscription = async (req, res) => {
   try {
-    const subscription = await subscriptionService.createSubscription({ ...req.body, user: req.user.id });
-    res.status(201).json({ success: true, data: subscription });
+    const { productId, productName, price, dietaryPreference, deliverySchedule, deliveryTime, selectedPlan } = req.body;
+      // Validation for required fields
+      if (!productId || !productName || !price || !dietaryPreference || !deliverySchedule || !deliveryTime || !selectedPlan) {
+        return res.status(400).json({ message: "All fields are required!" });
+    }
+    const newSubscription = new Subscription({
+        productId,
+        productName,
+        price,
+        dietaryPreference,
+        deliverySchedule,
+        deliveryTime,
+        selectedPlan
+    });
+
+    // Save the subscription to the database
+    await newSubscription.save();
+
+    res.status(201).json({ message: "Subscription successful!", data: newSubscription });
+
   } catch (error) {
-    next(error);
+      console.error("Error in subscription:", error);
+      res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-const getUserSubscriptions = async (req, res, next) => {
-  try {
-    const subscriptions = await subscriptionService.getUserSubscriptions(req.user.id);
-    res.status(200).json({ success: true, data: subscriptions });
-  } catch (error) {
-    next(error);
-  }
-};
 
-module.exports = { createSubscription, getUserSubscriptions };

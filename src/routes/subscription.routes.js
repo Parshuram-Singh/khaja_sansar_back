@@ -1,9 +1,10 @@
-const express = require('express');
+// routes/subscriptionRoutes.js
+import express from "express";
+import { saveSubscription } from "../controllers/subscription.controller.js";
+
 const router = express.Router();
-const subscriptionController = require('../controllers/subscription.controller');
-const authMiddleware = require('../middlewares/authMiddleware'); // Ensure user is logged in
 
-router.post('/', authMiddleware, subscriptionController.createSubscription);
-router.get('/', authMiddleware, subscriptionController.getUserSubscriptions);
+// Save subscription
+router.post("/subscribe", saveSubscription);
 
-module.exports = router;
+export default router;
