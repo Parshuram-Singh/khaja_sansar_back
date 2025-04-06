@@ -1,31 +1,20 @@
-import dotenv from "dotenv";
-import express from "express";
-import cors from "cors";
-import { connectDb } from "./db/db.js";
-import subscriptionRoutes from "./routes/subscription.routes.js";
+import app from './app.js';
+import { connectDb } from './db/db.js';
+import { config } from './config/config.js';
+import { shutdownServer } from './utils/shutdown.js';
 
-const app = express();
-dotenv.config({ path: "./.env" });
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Routes
-app.use("/api", subscriptionRoutes);
-app.get("/", (req, res) => {
-    res.send("I am here");
-});
-
-// MongoDB Connection
+// Start server
 connectDb()
-.then(() => {
-  app.listen(process.env.PORT || 3000, () => {
-    console.log(`successfully listen on ${process.env.PORT}`);
+  .then(() => {
+    const server = app.listen(config.port, () => {
+      console.log(`🚀 Server running on port ${config.port}`);
+    });
+    process.on('SIGINT', () => shutdownServer(server));
+    process.on('SIGTERM', () => shutdownServer(server));
   })
-})
-.catch((error) => {
-  console.log("MONGODB connection failed !! " , error)
-});
-
-
+  .catch((error) => {
+    console.error('❌ Database connection failed:', error);
+    process.exit(1);
+  });
+  

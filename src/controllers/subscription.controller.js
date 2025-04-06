@@ -31,3 +31,20 @@ export const saveSubscription = async (req, res) => {
 };
 
 
+export const getAllSubscription = async (req, res) => {
+  try {
+    const subscriptions = await Subscription.find();
+
+    // If no subscriptions are found, return a 404 error
+    if (subscriptions.length === 0) {
+      return res.status(404).json({ message: "No subscriptions found!" });
+    }
+
+    // Return the list of subscriptions
+    res.status(200).json({ message: "Subscriptions found!", data: subscriptions });
+
+  } catch (error) {
+    console.error("Error fetching subscriptions:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

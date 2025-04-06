@@ -5,9 +5,10 @@ const SubscriptionSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   price: { type: Number, required: true },
   dietaryPreference: { type: String, required: true },
-  deliverySchedule: { type: [String], required: true },
+  deliverySchedule: { type: [String], required: true }, 
   deliveryTime: { type: String, required: true },
   selectedPlan: { type: String, required: true },
+  paymentStatus: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
   createdAt: { type: Date, default: Date.now },
 });
 

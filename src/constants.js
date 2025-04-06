@@ -1,2 +1,2 @@
-//constants.js
+// /src/constants.js
 export const DB_NAME = "KhajaSansarDB";
