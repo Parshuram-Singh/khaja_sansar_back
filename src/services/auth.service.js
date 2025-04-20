@@ -3,8 +3,10 @@ import bcrypt from "bcryptjs";
 import { config } from "../config/config.js";
 
 // Generate Access Token
-export const generateAccessToken = (user) => {
-  return jwt.sign(
+export const generateAccessToken = async (user) => {
+  console.log(config.accessTokenSecret);
+  
+  return await jwt.sign(
     { id: user._id, role: user.role },
     config.accessTokenSecret,
     { expiresIn: config.accessTokenExpiry }

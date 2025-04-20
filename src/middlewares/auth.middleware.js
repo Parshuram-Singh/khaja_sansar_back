@@ -2,19 +2,22 @@ import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
 
 // Authentication Middleware
-export const authenticate = (req, res, next) => {
+export const authenticate = async (req, res, next) => {
   try {
-    // Get token from header
+    console.log("Authenticating user...");
     const authHeader = req.header("Authorization");
+    console.log("Authorization Header:", authHeader);
+
     if (!authHeader) {
+      console.log("No authorization header provided");
       return res.status(401).json({ 
         message: "Authentication failed: No authorization header provided",
         error: "NO_AUTH_HEADER"
       });
     }
 
-    // Check if token follows Bearer scheme
     if (!authHeader.startsWith("Bearer ")) {
+      console.log("Invalid token format:", authHeader);
       return res.status(401).json({ 
         message: "Authentication failed: Invalid token format",
         error: "INVALID_TOKEN_FORMAT"
@@ -22,19 +25,21 @@ export const authenticate = (req, res, next) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
+    console.log("Token:", token);
     if (!token) {
+      console.log("Token missing");
       return res.status(401).json({ 
         message: "Authentication failed: Token missing",
         error: "NO_TOKEN"
       });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, config.accessTokenSecret);
+    console.log("Decoded Token:", decoded);
     req.user = decoded;
     next();
   } catch (error) {
-    // Handle specific JWT errors
+    console.error("Authentication Error:", error);
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ 
         message: "Authentication failed: Token has expired",
@@ -48,7 +53,6 @@ export const authenticate = (req, res, next) => {
       });
     }
 
-    // Generic error
     return res.status(401).json({ 
       message: "Authentication failed: Unable to verify token",
       error: "AUTHENTICATION_ERROR",
@@ -56,7 +60,6 @@ export const authenticate = (req, res, next) => {
     });
   }
 };
-
 // Authorization Middleware
 export const authorize = (roles = []) => {
   return (req, res, next) => {
@@ -93,8 +96,3 @@ export const authorize = (roles = []) => {
     next();
   };
 };
-
-// Example usage:
-// app.get('/admin', authenticate, authorize(['admin']), adminRoute);
-// app.get('/user', authenticate, authorize(['user', 'admin']), userRoute);
-// app.get('/public', authenticate, authorize(), publicRoute);

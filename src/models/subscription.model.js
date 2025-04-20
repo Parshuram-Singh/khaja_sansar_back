@@ -1,16 +1,35 @@
 import mongoose from "mongoose";
 
 const SubscriptionSchema = new mongoose.Schema({
-  productId: { type: String, required: true },
-  productName: { type: String, required: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  paymentStatus: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
   price: { type: Number, required: true },
-  dietaryPreference: { type: String, required: true },
-  deliverySchedule: { type: [String], required: true }, 
   deliveryTime: { type: String, required: true },
   selectedPlan: { type: String, required: true },
-  paymentStatus: { type: String, enum: ["pending", "completed", "failed"], default: "pending" },
-  createdAt: { type: Date, default: Date.now },
-});
+  orderDetails: [
+    {
+      day: {
+        type: String,
+        required: true  
+      },
+      items: [
+        
+           {
+            type: [String],
+            required: true
+          },
+        
+      ]
+    }
+  ],
+},
+  { timestamps: true }
+
+);
 
 const Subscription = mongoose.model("Subscription", SubscriptionSchema);
 

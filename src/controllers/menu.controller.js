@@ -3,31 +3,35 @@ import Menu from '../models/menu.model.js';
 import { uploadToCloudinary } from '../utils/cloudinaryCloudService.js';
 
 export const createMenu = async (req, res) => {
-  try {
-    const { name, price, description } = req.body;
-    if (!name || !price) {
-      return res.status(400).json({ message: 'Name and price are required' });
+    try {
+        const { name, price, description, category, foodType, isAvailable } = req.body;
+
+        // Basic required field check
+        if (!name || !price || !category || !foodType) {
+            return res.status(400).json({ message: 'Name, price, category, and foodType are required' });
+        }
+
+        let imageUrl = null;
+        if (req.file) {
+            const result = await uploadToCloudinary(req.file.buffer);
+            imageUrl = result.secure_url;
+        }
+
+        const menuItem = await Menu.create({
+            name,
+            price,
+            description,
+            category,
+            foodType,
+            isAvailable: isAvailable !== undefined ? isAvailable : true, // Handle undefined case explicitly
+            image: imageUrl,
+        });
+
+        res.status(201).json({ message: 'Menu item created successfully', menuItem });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
-
-    let imageUrl = null;
-    if (req.file) {
-      const result = await uploadToCloudinary(req.file.buffer);
-      imageUrl = result.secure_url;
-    }
-
-    const menuItem = new Menu({
-      name,
-      price,
-      description,
-      image: imageUrl,
-    });
-
-    await menuItem.save();
-    res.status(201).json({ message: 'Menu item created successfully', menuItem });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error', error: error.message });
-  }
 };
 
 

@@ -1,10 +1,12 @@
-import dotenv from 'dotenv';
-import {DB_NAME} from "../constants.js"
+import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables
+import {DB_NAME} from "../constants.js"
+
+
 
 export const config = {
-  dbURI: process.env.MONGODB_URI,
+  dbURI:"mongodb+srv://KhajaSansar:Khaja12345@khajacluster.2xmyc.mongodb.net",
   dbName: DB_NAME,  // If you have a DB_NAME variable in the .env file
   accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
   refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,

@@ -1,46 +1,49 @@
-// controllers/subscription.controller.js
 import Subscription from "../models/subscription.model.js";
+import User from "../models/user.model.js";
+import nodeMailer from "../utils/EmailSender.js";
+import { generateSubscriptionMessage } from "../utils/EmailTemplates.js";
 
 // Save subscription
 export const saveSubscription = async (req, res) => {
   try {
-    const { productId, productName, price, dietaryPreference, deliverySchedule, deliveryTime, selectedPlan } = req.body;
-      // Validation for required fields
-      if (!productId || !productName || !price || !dietaryPreference || !deliverySchedule || !deliveryTime || !selectedPlan) {
-        return res.status(400).json({ message: "All fields are required!" });
+    const { userId, paymentStatus, price, deliveryTime, selectedPlan, orderDetails } = req.body;
+    const selectedUser = await User.findById(userId);
+    console.log("Selected user:", );
+
+    if (!selectedUser) {
+      return res.status(404).json({ message: "User not found!" });
     }
+
     const newSubscription = new Subscription({
-        productId,
-        productName,
-        price,
-        dietaryPreference,
-        deliverySchedule,
-        deliveryTime,
-        selectedPlan
+      userId: selectedUser._id,
+      paymentStatus,
+      price,
+      deliveryTime,
+      selectedPlan,
+      orderDetails,
     });
 
-    // Save the subscription to the database
     await newSubscription.save();
+    console.log("Saved subscription:", newSubscription);
 
-    res.status(201).json({ message: "Subscription successful!", data: newSubscription });
+    
+    res.status(201).json({ message: "Subscription successful!", data: newSubscription, status: 200 });
 
   } catch (error) {
-      console.error("Error in subscription:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error in subscription:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-
+// Get all subscriptions
 export const getAllSubscription = async (req, res) => {
   try {
     const subscriptions = await Subscription.find();
 
-    // If no subscriptions are found, return a 404 error
     if (subscriptions.length === 0) {
       return res.status(404).json({ message: "No subscriptions found!" });
     }
 
-    // Return the list of subscriptions
     res.status(200).json({ message: "Subscriptions found!", data: subscriptions });
 
   } catch (error) {
