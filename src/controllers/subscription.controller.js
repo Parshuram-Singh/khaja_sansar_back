@@ -6,27 +6,41 @@ import { generateSubscriptionMessage } from "../utils/EmailTemplates.js";
 // Save subscription
 export const saveSubscription = async (req, res) => {
   try {
-    const { userId, paymentStatus, price, deliveryTime, selectedPlan, orderDetails } = req.body;
+    console.log("Request body:", req.body);
+    
+    const {
+      userId,
+      paymentStatus,
+      price,
+      deliveryTime,
+      deliveryAddress,
+      startDate,
+      endDate,
+      type, 
+      orderDetails,
+    } = req.body;
+    
+    // Fetch the selected user from the database
     const selectedUser = await User.findById(userId);
-    console.log("Selected user:", );
+    console.log("Selected user:", selectedUser);
 
     if (!selectedUser) {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    const newSubscription = new Subscription({
+    // Create a new subscription document with the updated fields
+    const newSubscription = await Subscription.create({
       userId: selectedUser._id,
       paymentStatus,
       price,
       deliveryTime,
-      selectedPlan,
+      deliveryAddress,
+      startDate,
+      endDate,
+      type,
       orderDetails,
     });
-
-    await newSubscription.save();
     console.log("Saved subscription:", newSubscription);
-
-    
     res.status(201).json({ message: "Subscription successful!", data: newSubscription, status: 200 });
 
   } catch (error) {
@@ -34,6 +48,7 @@ export const saveSubscription = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 // Get all subscriptions
 export const getAllSubscription = async (req, res) => {
